@@ -1,10 +1,9 @@
 name: Supabase Backup
 
 # This controls when the action runs.
-# The video mentions running it on a schedule (at midnight).
 on:
   schedule:
-    # This is a cron definition for "at midnight (00:00) every day" [00:02:21]
+    # This is a cron definition for "at midnight (00:00) every day"
     - cron: '0 0 * * *'
   
   # This allows you to run the workflow manually from the Actions tab
@@ -14,55 +13,57 @@ jobs:
   run_db_backup:
     name: Run DB Backup
     
-    # This is the virtual environment the job will run on [00:03:05]
+    # This is the virtual environment the job will run on
     runs-on: ubuntu-latest
 
-    # These permissions allow the action to commit the backup files to your repo [00:03:27]
+    # These permissions allow the action to commit the backup files to your repo
     permissions:
       contents: write
 
-    # These are the environment variables used in the steps below [00:03:34]
+    # These are the environment variables used in the steps below
     env:
       SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
       BACKUP_ENABLED: ${{ vars.BACKUP_ENABLED }}
 
     steps:
       - name: Check if backups are enabled
-        # This step checks the variable you created in Step 3 [00:04:11]
+        # This step checks the variable you created
         if: env.BACKUP_ENABLED != 'true'
         run: |
           echo "Backup is disabled. Exiting."
           exit 1
 
       - name: Checkout code
-        # This downloads your repository code into the runner [00:05:19]
+        # This downloads your repository code into the runner
         uses: actions/checkout@v3
 
+      # --- THIS IS THE FIX ---
+      # This step uses the official Supabase action to install the CLI
       - name: Setup Supabase CLI
-      uses: supabase/setup-cli@v1
-          
+        uses: supabase/setup-cli@v1
+      # ---------------------
+
       - name: Create backup directory
-        # Creates the folder to store the backup files [00:05:40]
-        # The video uses 'prisma/backups' as an example path
+        # Creates the folder to store the backup files
         run: mkdir -p prisma/backups
 
       - name: Dump database roles
-        # Backs up user roles and permissions [00:05:56]
+        # Backs up user roles and permissions
         run: |
           supabase db dump --db-url "$SUPABASE_DB_URL" --role-only > prisma/backups/roles.sql
           
       - name: Dump database schema
-        # Backs up the database structure (tables, columns, etc.) [00:05:56]
+        # Backs up the database structure (tables, columns, etc.)
         run: |
           supabase db dump --db-url "$SUPABASE_DB_URL" --schema-only > prisma/backups/schema.sql
 
       - name: Dump database data
-        # Backs up the actual data in your tables [00:05:56]
+        # Backs up the actual data in your tables
         run: |
           supabase db dump --db-url "$SUPABASE_DB_URL" --data-only > prisma/backups/data.sql
 
       - name: Commit backup files
-        # This uses an action to automatically commit the 3 new SQL files [00:06:04]
+        # This uses an action to automatically commit the 3 new SQL files
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "chore: Supabase DB backup"
