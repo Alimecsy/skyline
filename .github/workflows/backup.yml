@@ -56,7 +56,11 @@ jobs:
       
       # --- I REMOVED THE REDUNDANT "Test DB connectivity" STEP ---
       # The step above already installs the postgresql-client.
-
+      
+      - name: Set PATH for PostgreSQL 17
+        run: |
+          echo "/usr/lib/postgresql/17/bin" >> $GITHUB_PATH
+    
       - name: Dump database roles
         # Backs up user roles and permissions
         run: |
