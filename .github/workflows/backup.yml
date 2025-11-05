@@ -1,48 +1,35 @@
 name: Supabase Backup
 
-# This controls when the action runs.
 on:
   schedule:
-    # This is a cron definition for "at midnight (00:00) every day"
     - cron: '0 0 * * *'
-  
-  # This allows you to run the workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   run_db_backup:
     name: Run DB Backup
-    
-    # This is the virtual environment the job will run on
     runs-on: ubuntu-latest
-
-    # These permissions allow the action to commit the backup files to your repo
     permissions:
       contents: write
-
-    # These are the environment variables used in the steps below
     env:
       SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
       BACKUP_ENABLED: ${{ vars.BACKUP_ENABLED }}
 
     steps:
       - name: Check if backups are enabled
-        # This step checks the variable you created
         if: env.BACKUP_ENABLED != 'true'
         run: |
           echo "Backup is disabled. Exiting."
           exit 1
 
       - name: Checkout code
-        # This downloads your repository code into the runner
         uses: actions/checkout@v3
 
-      - name: Setup Supabase CLI
-        # This step uses the official Supabase action to install the CLI
-        uses: supabase/setup-cli@v1
-
+      # --- WE NO LONGER NEED THE SUPABASE CLI SETUP ACTION ---
+      # - name: Setup Supabase CLI
+      #   uses: supabase/setup-cli@v1
+      
       - name: Create backup directory
-        # Creates the folder to store the backup files
         run: mkdir -p prisma/backups
 
       - name: Install PostgreSQL 17 client
@@ -52,36 +39,35 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client-17 dnsutils
       
-      # --- THIS IS THE NEW FIX ---
-      # This tells the runner where to find the version 17 commands
       - name: Ensure pg_dumpall 17 is on PATH
         run: |
           echo "/usr/lib/postgresql/17/bin" >> $GITHUB_PATH
 
-      # This step verifies that the correct version is now being used
       - name: Verify pg_dumpall version
         run: |
           which pg_dumpall
           pg_dumpall --version
-      # --------------------------
+          which pg_dump
+          pg_dump --version
+
+      # --- THIS IS THE MAJOR CHANGE ---
+      # We are now calling pg_dumpall and pg_dump directly,
+      # bypassing the 'supabase db dump' command.
 
       - name: Dump database roles
-        # Backs up user roles and permissions
+        # Note: pg_dumpall uses --roles-only (plural)
         run: |
-          supabase db dump --db-url "$SUPABASE_DB_URL" --role-only > prisma/backups/roles.sql
+          pg_dumpall --db-url "$SUPABASE_DB_URL" --roles-only > prisma/backups/roles.sql
           
       - name: Dump database schema
-        # Backs up the database structure (tables, columns, etc.)
         run: |
-          supabase db dump --db-url "$SUPABASE_DB_URL" --schema-only > prisma/backups/schema.sql
+          pg_dump --db-url "$SUPABASE_DB_URL" --schema-only > prisma/backups/schema.sql
 
       - name: Dump database data
-        # Backs up the actual data in your tables
         run: |
-          supabase db dump --db-url "$SUPABASE_DB_URL" --data-only > prisma/backups/data.sql
+          pg_dump --db-url "$SUPABASE_DB_URL" --data-only > prisma/backups/data.sql
 
       - name: Commit backup files
-        # This uses an action to automatically commit the 3 new SQL files
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "chore: Supabase DB backup"
