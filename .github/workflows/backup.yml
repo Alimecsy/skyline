@@ -49,7 +49,7 @@ jobs:
 
       - name: Test DB connectivity 
         run: |
-         apt-get update && apt-get install -y postgresql-client dnsutils
+         sudo apt-get update && apt-get install -y postgresql-client dnsutils
 
       - name: Dump database roles
         # Backs up user roles and permissions
