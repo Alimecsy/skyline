@@ -25,10 +25,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # --- WE NO LONGER NEED THE SUPABASE CLI SETUP ACTION ---
-      # - name: Setup Supabase CLI
-      #   uses: supabase/setup-cli@v1
-      
       - name: Create backup directory
         run: mkdir -p prisma/backups
 
@@ -50,22 +46,33 @@ jobs:
           which pg_dump
           pg_dump --version
 
-      # --- THIS IS THE MAJOR CHANGE ---
-      # We are now calling pg_dumpall and pg_dump directly,
-      # bypassing the 'supabase db dump' command.
-
-      - name: Dump database roles
-        # Note: pg_dumpall uses --roles-only (plural)
+      # --- THIS IS THE NEW FIX ---
+      # This step parses the URL and sets the standard PG environment variables
+      # which pg_dump and pg_dumpall will automatically use.
+      - name: Parse Connection String and Set Env Vars
         run: |
-          pg_dumpall --db-url "$SUPABASE_DB_URL" --roles-only > prisma/backups/roles.sql
+          # Extract the components from the URL: postgresql://USER:PASSWORD@HOST:PORT/DBNAME
+          # Note: This regex assumes your password does not contain '@' or ':'
+          echo "PGUSER=$(echo $SUPABASE_DB_URL | sed -n 's,postgresql://\([^:]*\):.*,\1,p')" >> $GITHUB_ENV
+          echo "PGPASSWORD=$(echo $SUPABASE_DB_URL | sed -n 's,postgresql://[^:]*:\([^@]*\)@.*,\1,p')" >> $GITHUB_ENV
+          echo "PGHOST=$(echo $SUPABASE_DB_URL | sed -n 's,postgresql://[^@]*@\([^:]*\):.*,\1,p')" >> $GITHUB_ENV
+          echo "PGPORT=$(echo $SUPABASE_DB_URL | sed -n 's,postgresql://[^@]*@[^:]*:\([0-9]*\)/.*,\1,p')" >> $GITHUB_ENV
+          echo "PGDATABASE=$(echo $SUPABASE_DB_URL | sed -n 's,postgresql://.*/\([^?]*\).*,\1,p')" >> $GITHUB_ENV
+
+      # --- DUMP COMMANDS NOW USE THE ENV VARS ---
+      # No connection flags are needed because the variables are set
+          
+      - name: Dump database roles
+        run: |
+          pg_dumpall --roles-only > prisma/backups/roles.sql
           
       - name: Dump database schema
         run: |
-          pg_dump --db-url "$SUPABASE_DB_URL" --schema-only > prisma/backups/schema.sql
+          pg_dump --schema-only > prisma/backups/schema.sql
 
       - name: Dump database data
         run: |
-          pg_dump --db-url "$SUPABASE_DB_URL" --data-only > prisma/backups/data.sql
+          pg_dump --data-only > prisma/backups/data.sql
 
       - name: Commit backup files
         uses: stefanzweifel/git-auto-commit-action@v4
