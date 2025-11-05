@@ -45,8 +45,6 @@ jobs:
         # Creates the folder to store the backup files
         run: mkdir -p prisma/backups
 
-      # --- THIS IS THE FIXED STEP ---
-      # The 'run: |' line is now correctly indented
       - name: Install PostgreSQL 17 client
         run: |
           sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
@@ -54,13 +52,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client-17 dnsutils
       
-      # --- I REMOVED THE REDUNDANT "Test DB connectivity" STEP ---
-      # The step above already installs the postgresql-client.
-      
-      - name: Set PATH for PostgreSQL 17
+      # --- THIS IS THE NEW FIX ---
+      # This tells the runner where to find the version 17 commands
+      - name: Ensure pg_dumpall 17 is on PATH
         run: |
           echo "/usr/lib/postgresql/17/bin" >> $GITHUB_PATH
-    
+
+      # This step verifies that the correct version is now being used
+      - name: Verify pg_dumpall version
+        run: |
+          which pg_dumpall
+          pg_dumpall --version
+      # --------------------------
+
       - name: Dump database roles
         # Backs up user roles and permissions
         run: |
