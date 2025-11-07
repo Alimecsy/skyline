@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict KkZKGkPHJ5eQIkp5EUEnBOUN6bymuFGWvSlUCTXeTvRgf3JPh4uPQvYMg5g37di
+\restrict ZuIMheuKCE4macaXwIUrUJEqpy8W4C8AalSyNt9ezKqX983esmELAqj2XpReuZm
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.6 (Ubuntu 17.6-2.pgdg24.04+1)
@@ -921,6 +921,56 @@ end $$;
 ALTER FUNCTION public._touch_updated_at() OWNER TO postgres;
 
 --
+-- Name: admin_exec(text); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.admin_exec(query text) RETURNS text
+    LANGUAGE plpgsql SECURITY DEFINER
+    AS $$
+DECLARE
+    outcome text;
+    ok boolean := true;
+BEGIN
+    BEGIN
+        EXECUTE query;
+        outcome := 'ok';
+    EXCEPTION WHEN OTHERS THEN
+        outcome := SQLERRM;
+        ok := false;
+    END;
+
+    -- ✅ Insert the log entry INSIDE the main block
+    INSERT INTO admin_exec_logs(query, result, success)
+    VALUES (query, outcome, ok);
+
+    RETURN outcome;
+END;
+$$;
+
+
+ALTER FUNCTION public.admin_exec(query text) OWNER TO postgres;
+
+--
+-- Name: cleanup_admin_exec_logs(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.cleanup_admin_exec_logs() RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    DELETE FROM admin_exec_logs
+    WHERE id NOT IN (
+        SELECT id FROM admin_exec_logs
+        ORDER BY executed_at DESC
+        LIMIT 500
+    );
+END;
+$$;
+
+
+ALTER FUNCTION public.cleanup_admin_exec_logs() OWNER TO postgres;
+
+--
 -- Name: exec_sql(text); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -928,10 +978,10 @@ CREATE FUNCTION public.exec_sql(query text) RETURNS json
     LANGUAGE plpgsql
     AS $$
 DECLARE
-  result json;
+    result json;
 BEGIN
-  EXECUTE query INTO result;
-  RETURN result;
+    EXECUTE format('SELECT json_agg(t) FROM (%s) t', query) INTO result;
+    RETURN result;
 END;
 $$;
 
@@ -1112,6 +1162,47 @@ ALTER FUNCTION public.mem_upsert(p_mode text, p_user_id uuid, p_tag text, p_wind
 COMMENT ON FUNCTION public.mem_upsert(p_mode text, p_user_id uuid, p_tag text, p_window text, p_text text, p_embedding public.vector, p_metadata jsonb) IS 'Upsert memory entry. Parameter p_window maps to time_window column.';
 
 
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: memories; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.memories (
+    id uuid DEFAULT extensions.uuid_generate_v4() NOT NULL,
+    user_id uuid,
+    agent_id uuid,
+    scope public.memory_scope DEFAULT 'semantic'::public.memory_scope NOT NULL,
+    content text NOT NULL,
+    importance smallint DEFAULT 3 NOT NULL,
+    expires_at timestamp with time zone,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    embedding public.vector(1536)
+);
+
+
+ALTER TABLE public.memories OWNER TO postgres;
+
+--
+-- Name: memories_needing_backfill(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.memories_needing_backfill() RETURNS SETOF public.memories
+    LANGUAGE plpgsql SECURITY DEFINER
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM public.memories
+    WHERE embedding IS NULL; -- Placeholder criteria for backfill
+END;
+$$;
+
+
+ALTER FUNCTION public.memories_needing_backfill() OWNER TO postgres;
+
 --
 -- Name: memories_needing_backfill(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
@@ -1290,21 +1381,21 @@ ALTER FUNCTION public.refresh_user_summaries() OWNER TO postgres;
 -- Name: remember_fact(uuid, uuid, public.memory_scope, text, smallint); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.remember_fact(p_user uuid, p_agent uuid, p_scope public.memory_scope, p_content text, p_importance smallint DEFAULT 3) RETURNS uuid
+CREATE FUNCTION public.remember_fact(user_id uuid, agent_id uuid, scope public.memory_scope, content text, importance smallint DEFAULT 3) RETURNS uuid
     LANGUAGE plpgsql SECURITY DEFINER
-    SET search_path TO 'public'
     AS $$
-declare new_id uuid;
-begin
-  insert into memories (user_id, agent_id, scope, content, importance)
-  values (p_user, p_agent, p_scope, p_content, p_importance)
-  returning id into new_id;
-  return new_id;
-end;
+DECLARE
+    new_memory_id uuid;
+BEGIN
+    INSERT INTO public.memories (user_id, agent_id, scope, content, importance)
+    VALUES (user_id, agent_id, scope, content, importance)
+    RETURNING id INTO new_memory_id;
+    RETURN new_memory_id;
+END;
 $$;
 
 
-ALTER FUNCTION public.remember_fact(p_user uuid, p_agent uuid, p_scope public.memory_scope, p_content text, p_importance smallint) OWNER TO postgres;
+ALTER FUNCTION public.remember_fact(user_id uuid, agent_id uuid, scope public.memory_scope, content text, importance smallint) OWNER TO postgres;
 
 --
 -- Name: set_user_summary(uuid, text); Type: FUNCTION; Schema: public; Owner: postgres
@@ -1352,10 +1443,6 @@ $$;
 
 
 ALTER FUNCTION public.touch_agents() OWNER TO postgres;
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
 
 --
 -- Name: alison_access; Type: TABLE; Schema: public; Owner: postgres
@@ -4153,6 +4240,43 @@ ALTER SEQUENCE public.activity_log_id_seq OWNED BY public.activity_log.id;
 
 
 --
+-- Name: admin_exec_logs; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.admin_exec_logs (
+    id bigint NOT NULL,
+    executed_at timestamp with time zone DEFAULT now(),
+    executed_by text DEFAULT CURRENT_USER,
+    query text NOT NULL,
+    result text,
+    success boolean
+);
+
+
+ALTER TABLE public.admin_exec_logs OWNER TO postgres;
+
+--
+-- Name: admin_exec_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.admin_exec_logs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.admin_exec_logs_id_seq OWNER TO postgres;
+
+--
+-- Name: admin_exec_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.admin_exec_logs_id_seq OWNED BY public.admin_exec_logs.id;
+
+
+--
 -- Name: agents; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4380,25 +4504,6 @@ ALTER SEQUENCE public.lava_webhook_events_id_seq OWNER TO postgres;
 
 ALTER SEQUENCE public.lava_webhook_events_id_seq OWNED BY public.lava_webhook_events.id;
 
-
---
--- Name: memories; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.memories (
-    id uuid DEFAULT extensions.uuid_generate_v4() NOT NULL,
-    user_id uuid,
-    agent_id uuid,
-    scope public.memory_scope DEFAULT 'semantic'::public.memory_scope NOT NULL,
-    content text NOT NULL,
-    importance smallint DEFAULT 3 NOT NULL,
-    expires_at timestamp with time zone,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    embedding public.vector(1536)
-);
-
-
-ALTER TABLE public.memories OWNER TO postgres;
 
 --
 -- Name: moderation_logs; Type: TABLE; Schema: public; Owner: postgres
@@ -5173,6 +5278,13 @@ ALTER TABLE ONLY public.activity_log ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
+-- Name: admin_exec_logs id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.admin_exec_logs ALTER COLUMN id SET DEFAULT nextval('public.admin_exec_logs_id_seq'::regclass);
+
+
+--
 -- Name: interactions id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -5541,6 +5653,14 @@ ALTER TABLE ONLY public.abuse_strikes
 
 ALTER TABLE ONLY public.activity_log
     ADD CONSTRAINT activity_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: admin_exec_logs admin_exec_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.admin_exec_logs
+    ADD CONSTRAINT admin_exec_logs_pkey PRIMARY KEY (id);
 
 
 --
@@ -8784,6 +8904,16 @@ GRANT ALL ON FUNCTION public._touch_updated_at() TO service_role;
 
 
 --
+-- Name: FUNCTION admin_exec(query text); Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION public.admin_exec(query text) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.admin_exec(query text) TO anon;
+GRANT ALL ON FUNCTION public.admin_exec(query text) TO authenticated;
+GRANT ALL ON FUNCTION public.admin_exec(query text) TO service_role;
+
+
+--
 -- Name: FUNCTION binary_quantize(public.halfvec); Type: ACL; Schema: public; Owner: supabase_admin
 --
 
@@ -8801,6 +8931,16 @@ GRANT ALL ON FUNCTION public.binary_quantize(public.vector) TO postgres;
 GRANT ALL ON FUNCTION public.binary_quantize(public.vector) TO anon;
 GRANT ALL ON FUNCTION public.binary_quantize(public.vector) TO authenticated;
 GRANT ALL ON FUNCTION public.binary_quantize(public.vector) TO service_role;
+
+
+--
+-- Name: FUNCTION cleanup_admin_exec_logs(); Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION public.cleanup_admin_exec_logs() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.cleanup_admin_exec_logs() TO anon;
+GRANT ALL ON FUNCTION public.cleanup_admin_exec_logs() TO authenticated;
+GRANT ALL ON FUNCTION public.cleanup_admin_exec_logs() TO service_role;
 
 
 --
@@ -9418,6 +9558,22 @@ GRANT ALL ON FUNCTION public.mem_upsert(p_mode text, p_user_id uuid, p_tag text,
 
 
 --
+-- Name: TABLE memories; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE public.memories TO service_role;
+
+
+--
+-- Name: FUNCTION memories_needing_backfill(); Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION public.memories_needing_backfill() TO anon;
+GRANT ALL ON FUNCTION public.memories_needing_backfill() TO authenticated;
+GRANT ALL ON FUNCTION public.memories_needing_backfill() TO service_role;
+
+
+--
 -- Name: FUNCTION memories_needing_backfill(p_limit integer); Type: ACL; Schema: public; Owner: postgres
 --
 
@@ -9443,10 +9599,12 @@ GRANT ALL ON FUNCTION public.refresh_user_summaries() TO service_role;
 
 
 --
--- Name: FUNCTION remember_fact(p_user uuid, p_agent uuid, p_scope public.memory_scope, p_content text, p_importance smallint); Type: ACL; Schema: public; Owner: postgres
+-- Name: FUNCTION remember_fact(user_id uuid, agent_id uuid, scope public.memory_scope, content text, importance smallint); Type: ACL; Schema: public; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION public.remember_fact(p_user uuid, p_agent uuid, p_scope public.memory_scope, p_content text, p_importance smallint) TO service_role;
+GRANT ALL ON FUNCTION public.remember_fact(user_id uuid, agent_id uuid, scope public.memory_scope, content text, importance smallint) TO anon;
+GRANT ALL ON FUNCTION public.remember_fact(user_id uuid, agent_id uuid, scope public.memory_scope, content text, importance smallint) TO authenticated;
+GRANT ALL ON FUNCTION public.remember_fact(user_id uuid, agent_id uuid, scope public.memory_scope, content text, importance smallint) TO service_role;
 
 
 --
@@ -10388,6 +10546,24 @@ GRANT ALL ON SEQUENCE public.activity_log_id_seq TO service_role;
 
 
 --
+-- Name: TABLE admin_exec_logs; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE public.admin_exec_logs TO anon;
+GRANT ALL ON TABLE public.admin_exec_logs TO authenticated;
+GRANT ALL ON TABLE public.admin_exec_logs TO service_role;
+
+
+--
+-- Name: SEQUENCE admin_exec_logs_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.admin_exec_logs_id_seq TO anon;
+GRANT ALL ON SEQUENCE public.admin_exec_logs_id_seq TO authenticated;
+GRANT ALL ON SEQUENCE public.admin_exec_logs_id_seq TO service_role;
+
+
+--
 -- Name: TABLE agents; Type: ACL; Schema: public; Owner: postgres
 --
 
@@ -10443,13 +10619,6 @@ GRANT ALL ON TABLE public.interactions TO service_role;
 --
 
 GRANT ALL ON SEQUENCE public.interactions_id_seq TO service_role;
-
-
---
--- Name: TABLE memories; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.memories TO service_role;
 
 
 --
@@ -11030,5 +11199,5 @@ ALTER EVENT TRIGGER pgrst_drop_watch OWNER TO supabase_admin;
 -- PostgreSQL database dump complete
 --
 
-\unrestrict KkZKGkPHJ5eQIkp5EUEnBOUN6bymuFGWvSlUCTXeTvRgf3JPh4uPQvYMg5g37di
+\unrestrict ZuIMheuKCE4macaXwIUrUJEqpy8W4C8AalSyNt9ezKqX983esmELAqj2XpReuZm
 

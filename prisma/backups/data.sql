@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict k62r4BQE7oasElFRrLnhaRMis1YqAcgkwrW6pTQN3QWHtZN4HYWxmxzxgr4jqfG
+\restrict dVbn5pAZDPYd3ncWgnKaG2F0dMFw2NLXVSMJn6FgTeqYiyIa7NvWE1ZDhIYuGZS
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.6 (Ubuntu 17.6-2.pgdg24.04+1)
@@ -338,6 +338,43 @@ COPY public.activity_log (id, "timestamp", action, table_name, payload, success,
 2	2025-11-04 12:37:11.103937+00	sql	\N	{"sql": "select table_name\\nfrom information_schema.tables\\nwhere table_schema='public'\\n  and table_name in ('users','messages','memories','agents','products');"}	f	{'code': '22P02', 'details': 'Token "agents" is invalid.', 'hint': None, 'message': 'invalid input syntax for type json'}
 3	2025-11-04 12:38:26.820318+00	sql	\N	{"sql": "SELECT json_agg(t.table_name) FROM information_schema.tables t WHERE t.table_schema='public' AND t.table_name IN ('users', 'messages', 'memories', 'agents', 'products');"}	t	\N
 4	2025-11-04 12:50:51.616532+00	sql	\N	{"sql": "SELECT json_agg(r.routine_name) FROM information_schema.routines r WHERE r.specific_schema='public' AND r.routine_name IN ('memory_upsert', 'match_documents', 'get_recent_messages');"}	t	\N
+5	2025-11-06 11:48:22.629068+00	sql	\N	{"sql": "SELECT * FROM pg_extension WHERE extname = 'vector'"}	t	\N
+6	2025-11-06 11:48:33.30316+00	sql	\N	{"sql": "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('users', 'memories', 'messages', 'agents')"}	f	{'code': '22P02', 'details': 'Token "agents" is invalid.', 'hint': None, 'message': 'invalid input syntax for type json'}
+7	2025-11-06 11:49:24.975392+00	sql	\N	{"sql": "SELECT 1 FROM pg_extension WHERE extname = 'vector'"}	t	\N
+8	2025-11-06 11:50:18.268847+00	sql	\N	{"sql": "SELECT table_name, column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_schema = 'public' AND table_name IN ('users', 'memories', 'messages', 'agents', 'chat_users') ORDER BY table_name, ordinal_position;"}	f	{'code': '22P02', 'details': 'Token "agents" is invalid.', 'hint': None, 'message': 'invalid input syntax for type json'}
+9	2025-11-06 11:56:56.021218+00	sql	\N	{"sql": "SELECT json_agg(row_to_json(c)) FROM (SELECT table_name, column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_schema = 'public' AND table_name IN ('users', 'memories', 'messages', 'agents', 'chat_users') ORDER BY table_name, ordinal_position) c;"}	f	{'code': '42601', 'details': None, 'hint': None, 'message': 'syntax error at or near ";"'}
+10	2025-11-06 11:57:36.078385+00	sql	\N	{"sql": "SELECT json_agg(row_to_json(c)) FROM (SELECT table_name, column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_schema = 'public' AND table_name IN ('users', 'memories', 'messages', 'agents', 'chat_users') ORDER BY table_name, ordinal_position) c"}	t	\N
+11	2025-11-06 11:57:48.131315+00	sql	\N	{"sql": "SELECT json_agg(row_to_json(i)) FROM (SELECT tablename, indexname, indexdef FROM pg_indexes WHERE schemaname = 'public' AND tablename IN ('users', 'memories', 'messages', 'agents', 'chat_users')) i"}	t	\N
+12	2025-11-06 11:57:57.668209+00	sql	\N	{"sql": "SELECT json_agg(row_to_json(e)) FROM (SELECT t.typname AS enum_type, e.enumlabel AS enum_value FROM pg_type t JOIN pg_enum e ON t.oid = e.enumtypid WHERE t.typname = 'memory_scope') e"}	t	\N
+13	2025-11-06 11:58:08.199869+00	sql	\N	{"sql": "SELECT json_agg(row_to_json(p)) FROM (SELECT policyname, tablename, cmd, permissive FROM pg_policies WHERE schemaname = 'public' AND tablename IN ('users', 'memories', 'messages', 'agents', 'chat_users')) p"}	t	\N
+14	2025-11-06 11:58:16.240682+00	sql	\N	{"sql": "SELECT json_agg(row_to_json(f)) FROM (SELECT proname FROM pg_proc WHERE proname IN ('remember_fact', 'memories_needing_backfill')) f"}	t	\N
+15	2025-11-06 11:59:44.409902+00	sql	\N	{"sql": "-- PHASE 2: Alison Hatt v6.1 Schema Generation\\n\\n-- Ensure pgvector extension is enabled (idempotent)\\nCREATE EXTENSION IF NOT EXISTS vector;\\n\\n-- Alter memories.embedding column type to vector(1536)\\n-- WARNING: This is a type alteration. While idempotent, it can be destructive if existing data is incompatible.\\n-- Ensure existing 'embedding' data can be cast to 'vector(1536)'.\\nALTER TABLE public.memories\\nALTER COLUMN embedding TYPE vector(1536) USING embedding::vector(1536);\\n\\n-- Create or replace remember_fact function\\nCREATE OR REPLACE FUNCTION public.remember_fact(\\n    user_id uuid,\\n    agent_id uuid,\\n    scope public.memory_scope,\\n    content text,\\n    importance smallint DEFAULT 3\\n)\\nRETURNS uuid\\nLANGUAGE plpgsql\\nSECURITY DEFINER\\nAS $$\\nDECLARE\\n    new_memory_id uuid;\\nBEGIN\\n    INSERT INTO public.memories (user_id, agent_id, scope, content, importance)\\n    VALUES (user_id, agent_id, scope, content, importance)\\n    RETURNING id INTO new_memory_id;\\n    RETURN new_memory_id;\\nEND;\\n$$;\\n\\n-- Create or replace memories_needing_backfill function\\nCREATE OR REPLACE FUNCTION public.memories_needing_backfill()\\nRETURNS SETOF public.memories\\nLANGUAGE plpgsql\\nSECURITY DEFINER\\nAS $$\\nBEGIN\\n    RETURN QUERY\\n    SELECT *\\n    FROM public.memories\\n    WHERE embedding IS NULL; -- Placeholder criteria for backfill\\nEND;\\n$$;\\n\\n-- No new tables or columns identified for additive changes beyond embedding type.\\n-- Existing RLS policies and indexes are assumed to be sufficient."}	f	{'code': '42601', 'details': None, 'hint': None, 'message': 'syntax error at or near "CREATE"'}
+16	2025-11-06 12:00:45.221699+00	sql	\N	{"sql": "CREATE EXTENSION IF NOT EXISTS vector"}	f	{'code': '42601', 'details': None, 'hint': None, 'message': 'syntax error at or near "CREATE"'}
+17	2025-11-06 12:01:30.942192+00	sql	\N	{"sql": "SELECT 1"}	t	\N
+18	2025-11-06 12:30:29.870554+00	sql	\N	{"sql": "SELECT admin_exec('CREATE EXTENSION IF NOT EXISTS vector')"}	t	\N
+19	2025-11-06 12:30:40.271927+00	sql	\N	{"sql": "SELECT admin_exec('ALTER TABLE public.memories ALTER COLUMN embedding TYPE vector(1536) USING embedding::vector(1536)')"}	t	\N
+20	2025-11-06 12:30:52.461879+00	sql	\N	{"sql": "SELECT admin_exec('CREATE OR REPLACE FUNCTION public.remember_fact(\\n    user_id uuid,\\n    agent_id uuid,\\n    scope public.memory_scope,\\n    content text,\\n    importance smallint DEFAULT 3\\n)\\nRETURNS uuid\\nLANGUAGE plpgsql\\nSECURITY DEFINER\\nAS $$\\nDECLARE\\n    new_memory_id uuid;\\nBEGIN\\n    INSERT INTO public.memories (user_id, agent_id, scope, content, importance)\\n    VALUES (user_id, agent_id, scope, content, importance)\\n    RETURNING id INTO new_memory_id;\\n    RETURN new_memory_id;\\nEND;\\n$$')"}	t	\N
+21	2025-11-06 12:31:47.575798+00	sql	\N	{"sql": "SELECT admin_exec('DROP FUNCTION IF EXISTS public.remember_fact(uuid, uuid, public.memory_scope, text, smallint)')"}	t	\N
+22	2025-11-06 12:31:57.143957+00	sql	\N	{"sql": "SELECT admin_exec('CREATE OR REPLACE FUNCTION public.remember_fact(\\n    user_id uuid,\\n    agent_id uuid,\\n    scope public.memory_scope,\\n    content text,\\n    importance smallint DEFAULT 3\\n)\\nRETURNS uuid\\nLANGUAGE plpgsql\\nSECURITY DEFINER\\nAS $$\\nDECLARE\\n    new_memory_id uuid;\\nBEGIN\\n    INSERT INTO public.memories (user_id, agent_id, scope, content, importance)\\n    VALUES (user_id, agent_id, scope, content, importance)\\n    RETURNING id INTO new_memory_id;\\n    RETURN new_memory_id;\\nEND;\\n$$')"}	t	\N
+23	2025-11-06 12:32:07.014807+00	sql	\N	{"sql": "SELECT admin_exec('CREATE OR REPLACE FUNCTION public.memories_needing_backfill()\\nRETURNS SETOF public.memories\\nLANGUAGE plpgsql\\nSECURITY DEFINER\\nAS $$\\nBEGIN\\n    RETURN QUERY\\n    SELECT *\\n    FROM public.memories\\n    WHERE embedding IS NULL; -- Placeholder criteria for backfill\\nEND;\\n$$')"}	t	\N
+24	2025-11-06 12:33:16.069873+00	sql	\N	{"sql": "SELECT json_agg(row_to_json(c)) FROM (SELECT data_type FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'memories' AND column_name = 'embedding') c"}	t	\N
+25	2025-11-06 12:33:33.529537+00	sql	\N	{"sql": "SELECT json_agg(row_to_json(t)) FROM (SELECT format_type(a.atttypid, a.atttypmod) AS column_type FROM pg_attribute a JOIN pg_class c ON a.attrelid = c.oid WHERE c.relname = 'memories' AND a.attname = 'embedding') t"}	t	\N
+26	2025-11-06 12:33:48.677093+00	sql	\N	{"sql": "SELECT json_agg(row_to_json(f)) FROM (SELECT proname FROM pg_proc WHERE proname IN ('remember_fact', 'memories_needing_backfill')) f"}	t	\N
+\.
+
+
+--
+-- Data for Name: admin_exec_logs; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.admin_exec_logs (id, executed_at, executed_by, query, result, success) FROM stdin;
+1	2025-11-06 12:25:45.417006+00	postgres	CREATE EXTENSION IF NOT EXISTS vector;	ok	t
+2	2025-11-06 12:30:28.610957+00	postgres	CREATE EXTENSION IF NOT EXISTS vector	ok	t
+3	2025-11-06 12:30:38.938571+00	postgres	ALTER TABLE public.memories ALTER COLUMN embedding TYPE vector(1536) USING embedding::vector(1536)	ok	t
+4	2025-11-06 12:30:51.321068+00	postgres	CREATE OR REPLACE FUNCTION public.remember_fact(\n    user_id uuid,\n    agent_id uuid,\n    scope public.memory_scope,\n    content text,\n    importance smallint DEFAULT 3\n)\nRETURNS uuid\nLANGUAGE plpgsql\nSECURITY DEFINER\nAS $$\nDECLARE\n    new_memory_id uuid;\nBEGIN\n    INSERT INTO public.memories (user_id, agent_id, scope, content, importance)\n    VALUES (user_id, agent_id, scope, content, importance)\n    RETURNING id INTO new_memory_id;\n    RETURN new_memory_id;\nEND;\n$$	cannot change name of input parameter "p_user"	f
+5	2025-11-06 12:31:46.319145+00	postgres	DROP FUNCTION IF EXISTS public.remember_fact(uuid, uuid, public.memory_scope, text, smallint)	ok	t
+6	2025-11-06 12:31:56.120526+00	postgres	CREATE OR REPLACE FUNCTION public.remember_fact(\n    user_id uuid,\n    agent_id uuid,\n    scope public.memory_scope,\n    content text,\n    importance smallint DEFAULT 3\n)\nRETURNS uuid\nLANGUAGE plpgsql\nSECURITY DEFINER\nAS $$\nDECLARE\n    new_memory_id uuid;\nBEGIN\n    INSERT INTO public.memories (user_id, agent_id, scope, content, importance)\n    VALUES (user_id, agent_id, scope, content, importance)\n    RETURNING id INTO new_memory_id;\n    RETURN new_memory_id;\nEND;\n$$	ok	t
+7	2025-11-06 12:32:06.221111+00	postgres	CREATE OR REPLACE FUNCTION public.memories_needing_backfill()\nRETURNS SETOF public.memories\nLANGUAGE plpgsql\nSECURITY DEFINER\nAS $$\nBEGIN\n    RETURN QUERY\n    SELECT *\n    FROM public.memories\n    WHERE embedding IS NULL; -- Placeholder criteria for backfill\nEND;\n$$	ok	t
 \.
 
 
@@ -2489,7 +2526,14 @@ SELECT pg_catalog.setval('public.abuse_strikes_id_seq', 1, false);
 -- Name: activity_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.activity_log_id_seq', 4, true);
+SELECT pg_catalog.setval('public.activity_log_id_seq', 26, true);
+
+
+--
+-- Name: admin_exec_logs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.admin_exec_logs_id_seq', 7, true);
 
 
 --
@@ -2538,5 +2582,5 @@ SELECT pg_catalog.setval('realtime.subscription_id_seq', 1, false);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict k62r4BQE7oasElFRrLnhaRMis1YqAcgkwrW6pTQN3QWHtZN4HYWxmxzxgr4jqfG
+\unrestrict dVbn5pAZDPYd3ncWgnKaG2F0dMFw2NLXVSMJn6FgTeqYiyIa7NvWE1ZDhIYuGZS
 
