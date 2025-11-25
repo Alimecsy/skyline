@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict rq8pQOMRgIuW0wE9SLPLiUthVg2GHJOROMZwB4Ubz1PUK3zZTZRDKBEDbQd7Qzb
+\restrict D2SfKwTAYIfqezGR7gLWOTm9rcg3n70CWfKEMUHLGRIEa1L98cVRJJBapvZj6Xc
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.7 (Ubuntu 17.7-3.pgdg24.04+1)
@@ -11199,5 +11199,5 @@ ALTER EVENT TRIGGER pgrst_drop_watch OWNER TO supabase_admin;
 -- PostgreSQL database dump complete
 --
 
-\unrestrict rq8pQOMRgIuW0wE9SLPLiUthVg2GHJOROMZwB4Ubz1PUK3zZTZRDKBEDbQd7Qzb
+\unrestrict D2SfKwTAYIfqezGR7gLWOTm9rcg3n70CWfKEMUHLGRIEa1L98cVRJJBapvZj6Xc
 
