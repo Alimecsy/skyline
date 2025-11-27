@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 9bQucvVNDDbuNOqLkrfEvuNgnB7Afvx1uNF5OfeOs43h6KyEYJl0jGipecZOvc2
+\restrict ZnKSP5YzgZE57uiIpwoh4GmBipwh0GW6LH6n1wkmyMel3XlNrTIAnM4M9hGr98a
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.7 (Ubuntu 17.7-3.pgdg24.04+1)
@@ -3771,9 +3771,11 @@ CREATE TABLE auth.oauth_authorizations (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     expires_at timestamp with time zone DEFAULT (now() + '00:03:00'::interval) NOT NULL,
     approved_at timestamp with time zone,
+    nonce text,
     CONSTRAINT oauth_authorizations_authorization_code_length CHECK ((char_length(authorization_code) <= 255)),
     CONSTRAINT oauth_authorizations_code_challenge_length CHECK ((char_length(code_challenge) <= 128)),
     CONSTRAINT oauth_authorizations_expires_at_future CHECK ((expires_at > created_at)),
+    CONSTRAINT oauth_authorizations_nonce_length CHECK ((char_length(nonce) <= 255)),
     CONSTRAINT oauth_authorizations_redirect_uri_length CHECK ((char_length(redirect_uri) <= 2048)),
     CONSTRAINT oauth_authorizations_resource_length CHECK ((char_length(resource) <= 2048)),
     CONSTRAINT oauth_authorizations_scope_length CHECK ((char_length(scope) <= 4096)),
@@ -3983,7 +3985,9 @@ CREATE TABLE auth.sessions (
     tag text,
     oauth_client_id uuid,
     refresh_token_hmac_key text,
-    refresh_token_counter bigint
+    refresh_token_counter bigint,
+    scopes text,
+    CONSTRAINT sessions_scopes_length CHECK ((char_length(scopes) <= 4096))
 );
 
 
@@ -11199,5 +11203,5 @@ ALTER EVENT TRIGGER pgrst_drop_watch OWNER TO supabase_admin;
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 9bQucvVNDDbuNOqLkrfEvuNgnB7Afvx1uNF5OfeOs43h6KyEYJl0jGipecZOvc2
+\unrestrict ZnKSP5YzgZE57uiIpwoh4GmBipwh0GW6LH6n1wkmyMel3XlNrTIAnM4M9hGr98a
 
