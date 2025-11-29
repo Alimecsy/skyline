@@ -2,7 +2,7 @@
 -- PostgreSQL database cluster dump
 --
 
-\restrict NeBzKWF3EazsWNJsyAoC5otG9BxzcQOdxQo1PuU0qj30EV53YuNThPPgsO8Ldcf
+\restrict NGUbS34G9PZmkB2lHix8ShikDrpsW4mYa0JFZKa2RZAYngShbRBBtd9aXxRl7g1
 
 SET default_transaction_read_only = off;
 
@@ -129,7 +129,7 @@ GRANT supabase_realtime_admin TO postgres WITH INHERIT TRUE GRANTED BY supabase_
 
 
 
-\unrestrict NeBzKWF3EazsWNJsyAoC5otG9BxzcQOdxQo1PuU0qj30EV53YuNThPPgsO8Ldcf
+\unrestrict NGUbS34G9PZmkB2lHix8ShikDrpsW4mYa0JFZKa2RZAYngShbRBBtd9aXxRl7g1
 
 --
 -- PostgreSQL database cluster dump complete
