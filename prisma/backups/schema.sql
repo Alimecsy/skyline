@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 5rdf5YEuLa4Sj85lvPQSV7SKyYhjZw8mRGfdB2A5yFBlScojZUnX8zaCMhTt8fZ
+\restrict YUbw9sQn5akLKFeaksTuxBM5bRAalesSJRmZSGwkcVCpnNJLQxKTFL6GZ9fpvAr
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.7 (Ubuntu 17.7-3.pgdg24.04+1)
@@ -3786,6 +3786,27 @@ CREATE TABLE auth.oauth_authorizations (
 ALTER TABLE auth.oauth_authorizations OWNER TO supabase_auth_admin;
 
 --
+-- Name: oauth_client_states; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
+--
+
+CREATE TABLE auth.oauth_client_states (
+    id uuid NOT NULL,
+    provider_type text NOT NULL,
+    code_verifier text,
+    created_at timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE auth.oauth_client_states OWNER TO supabase_auth_admin;
+
+--
+-- Name: TABLE oauth_client_states; Type: COMMENT; Schema: auth; Owner: supabase_auth_admin
+--
+
+COMMENT ON TABLE auth.oauth_client_states IS 'Stores OAuth states for third-party provider authentication flows where Supabase acts as the OAuth client.';
+
+
+--
 -- Name: oauth_clients; Type: TABLE; Schema: auth; Owner: supabase_auth_admin
 --
 
@@ -5516,6 +5537,14 @@ ALTER TABLE ONLY auth.oauth_authorizations
 
 
 --
+-- Name: oauth_client_states oauth_client_states_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
+--
+
+ALTER TABLE ONLY auth.oauth_client_states
+    ADD CONSTRAINT oauth_client_states_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: oauth_clients oauth_clients_pkey; Type: CONSTRAINT; Schema: auth; Owner: supabase_auth_admin
 --
 
@@ -6095,6 +6124,13 @@ CREATE INDEX identities_user_id_idx ON auth.identities USING btree (user_id);
 --
 
 CREATE INDEX idx_auth_code ON auth.flow_state USING btree (auth_code);
+
+
+--
+-- Name: idx_oauth_client_states_created_at; Type: INDEX; Schema: auth; Owner: supabase_auth_admin
+--
+
+CREATE INDEX idx_oauth_client_states_created_at ON auth.oauth_client_states USING btree (created_at);
 
 
 --
@@ -10400,6 +10436,14 @@ GRANT ALL ON TABLE auth.oauth_authorizations TO dashboard_user;
 
 
 --
+-- Name: TABLE oauth_client_states; Type: ACL; Schema: auth; Owner: supabase_auth_admin
+--
+
+GRANT ALL ON TABLE auth.oauth_client_states TO postgres;
+GRANT ALL ON TABLE auth.oauth_client_states TO dashboard_user;
+
+
+--
 -- Name: TABLE oauth_clients; Type: ACL; Schema: auth; Owner: supabase_auth_admin
 --
 
@@ -11203,5 +11247,5 @@ ALTER EVENT TRIGGER pgrst_drop_watch OWNER TO supabase_admin;
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 5rdf5YEuLa4Sj85lvPQSV7SKyYhjZw8mRGfdB2A5yFBlScojZUnX8zaCMhTt8fZ
+\unrestrict YUbw9sQn5akLKFeaksTuxBM5bRAalesSJRmZSGwkcVCpnNJLQxKTFL6GZ9fpvAr
 

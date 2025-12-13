@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict a9oeDjmKoLIufER5d9PsS4avGop0BYlWacrNQjRRcIKQ5GNMAmEYXKYnMXH9wYv
+\restrict ThgnjV7izDujMAQajlQzSPJ6ZUL5oXIRR3yhxChuOyMtvcFH7HpgZLwzKnAwsnH
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.7 (Ubuntu 17.7-3.pgdg24.04+1)
@@ -180,6 +180,14 @@ COPY auth.oauth_authorizations (id, authorization_id, client_id, user_id, redire
 
 
 --
+-- Data for Name: oauth_client_states; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+COPY auth.oauth_client_states (id, provider_type, code_verifier, created_at) FROM stdin;
+\.
+
+
+--
 -- Data for Name: oauth_consents; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
 --
 
@@ -303,6 +311,7 @@ COPY auth.schema_migrations (version) FROM stdin;
 20251007112900
 20251104100000
 20251111201300
+20251201000000
 \.
 
 
@@ -2775,5 +2784,5 @@ SELECT pg_catalog.setval('realtime.subscription_id_seq', 1, false);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict a9oeDjmKoLIufER5d9PsS4avGop0BYlWacrNQjRRcIKQ5GNMAmEYXKYnMXH9wYv
+\unrestrict ThgnjV7izDujMAQajlQzSPJ6ZUL5oXIRR3yhxChuOyMtvcFH7HpgZLwzKnAwsnH
 
