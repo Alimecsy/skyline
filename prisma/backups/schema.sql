@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict KwLEV4PWZJ0h9Hfn7oBCdo3I1BvghquaWHqo4mpeY1FHOsa87nL5YzL2T0kqTyh
+\restrict vDXP7B6TgYe8AR3gvPDWj5dXg2EuNU1MV7v2u0QUTc8cur1OPhxJiKJOzV7sAel
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.7 (Ubuntu 17.7-3.pgdg24.04+1)
@@ -886,21 +886,22 @@ COMMENT ON FUNCTION extensions.set_graphql_placeholder() IS 'Reintroduces placeh
 
 CREATE FUNCTION pgbouncer.get_auth(p_usename text) RETURNS TABLE(username text, password text)
     LANGUAGE plpgsql SECURITY DEFINER
+    SET search_path TO ''
     AS $_$
-begin
-    raise debug 'PgBouncer auth request: %', p_usename;
+  BEGIN
+      RAISE DEBUG 'PgBouncer auth request: %', p_usename;
 
-    return query
-    select 
-        rolname::text, 
-        case when rolvaliduntil < now() 
-            then null 
-            else rolpassword::text 
-        end 
-    from pg_authid 
-    where rolname=$1 and rolcanlogin;
-end;
-$_$;
+      RETURN QUERY
+      SELECT
+          rolname::text,
+          CASE WHEN rolvaliduntil < now()
+              THEN null
+              ELSE rolpassword::text
+          END
+      FROM pg_authid
+      WHERE rolname=$1 and rolcanlogin;
+  END;
+  $_$;
 
 
 ALTER FUNCTION pgbouncer.get_auth(p_usename text) OWNER TO supabase_admin;
@@ -8933,7 +8934,6 @@ GRANT ALL ON FUNCTION graphql_public.graphql("operationName" text, query text, v
 
 REVOKE ALL ON FUNCTION pgbouncer.get_auth(p_usename text) FROM PUBLIC;
 GRANT ALL ON FUNCTION pgbouncer.get_auth(p_usename text) TO pgbouncer;
-GRANT ALL ON FUNCTION pgbouncer.get_auth(p_usename text) TO postgres;
 
 
 --
@@ -11247,5 +11247,5 @@ ALTER EVENT TRIGGER pgrst_drop_watch OWNER TO supabase_admin;
 -- PostgreSQL database dump complete
 --
 
-\unrestrict KwLEV4PWZJ0h9Hfn7oBCdo3I1BvghquaWHqo4mpeY1FHOsa87nL5YzL2T0kqTyh
+\unrestrict vDXP7B6TgYe8AR3gvPDWj5dXg2EuNU1MV7v2u0QUTc8cur1OPhxJiKJOzV7sAel
 
