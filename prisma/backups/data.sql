@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict y0ceJpaRjcDceOtZvTU5fhe5g5iKktZ5slUeh5uUgVcEypX5bMjbiHUcobXxyC1
+\restrict iZU2NGAXYGFrDLJImn1rid7SfsAIbjfv9DN0mzegLL47PJcVinMa6Y0btA9TrEv
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.7 (Ubuntu 17.7-3.pgdg24.04+1)
@@ -435,11 +435,11 @@ c4b930cb-00bf-45b6-8f29-13ead6f96b2b	beautybybabies	{"locale": "ru", "last_name"
 --
 
 COPY public.chat_users (id, platform, platform_user_id, chat_id, username, display_name, linked_user_id, last_seen_at, meta, created_at, updated_at) FROM stdin;
+b66f0720-6813-4bec-b829-af016d65f7a6	telegram	1916087935	1916087935	Mecsy101	Mecsy Chimezie	\N	2025-12-20 12:25:06.377+00	{}	2025-09-12 14:44:26.980871+00	2025-12-20 12:25:06.451407+00
 575790f4-9bf4-45c8-86a2-1effeb391ce1	telegram	1670385629	1670385629	elisssabel	\N	\N	2025-09-26 07:53:02.685+00	{}	2025-09-26 07:53:02.807583+00	2025-09-26 07:53:02.807583+00
 9479f7c5-ceca-4548-841c-6e206273fec9	telegram	239798255	239798255	sterjen1	\N	\N	2025-09-26 09:44:02.112+00	{}	2025-09-26 09:10:24.480355+00	2025-09-26 09:44:02.214474+00
 e1dbcf35-94b2-411a-8300-8dcb94cbec0f	telegram	5468055172	5468055172	vpuppsy	\N	\N	2025-09-26 23:51:05.76+00	{}	2025-09-15 16:15:43.608834+00	2025-09-26 23:51:06.139874+00
 9ce6f9fa-2b7b-4d60-8212-a3964c51f25e	telegram	348210710	348210710	beautybybabies	Никита Прокофьев	\N	2025-11-23 18:30:32.219+00	{}	2025-09-15 04:31:38.146162+00	2025-11-23 18:30:32.448513+00
-b66f0720-6813-4bec-b829-af016d65f7a6	telegram	1916087935	1916087935	Mecsy101	Mecsy Chimezie	\N	2025-11-22 22:36:49.522+00	{}	2025-09-12 14:44:26.980871+00	2025-11-22 22:36:49.598527+00
 58bccd6c-ffdb-4f76-a727-9be3181cbb2d	telegram	414197473	414197473	midmind	Митя	\N	2025-10-19 16:34:42.582+00	{}	2025-10-19 15:53:53.537241+00	2025-10-19 16:34:42.775036+00
 695561b8-597f-4ee8-9e45-bf9d743dba12	telegram	6283638284	6283638284	Foreignbish	\N	\N	2025-09-19 11:44:51.238+00	{}	2025-09-15 14:12:24.649703+00	2025-09-19 11:44:51.534039+00
 96b2c6bd-277e-4573-9ec0-1ec74c9754aa	telegram	5734527706	5734527706	assdbssa	\N	\N	2025-10-03 08:25:34.18+00	{}	2025-10-03 08:23:33.875509+00	2025-10-03 08:25:34.275106+00
@@ -1411,6 +1411,10 @@ COPY public.interactions (id, platform, platform_user_id, direction, channel, co
 852	telegram	348210710	out	Al_secret_bot	Взаимно, солнышко. 🌞 Что принесло тебя сюда сегодня? Или просто решил заглянуть, чтобы провести время вместе?	1763921678658-348210710	1.000	greet	none	\N	\N	\N	"{\\"actions\\":[\\"ask_question\\"],\\"tone\\":\\"warm\\",\\"emotion\\":\\"admiration\\",\\"trust\\":\\"high\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"smalltalk\\",\\"confidence\\":0.95}"	2025-11-23 18:14:46.394+00	\N	beautybybabies
 853	telegram	348210710	in	telegram	Да я не тебе ябы ей сказал	1763922630977-348210710	\N	\N	\N	\N	\N	\N	{"tg_message_id": 410}	2025-11-23 18:30:32.754079+00	\N	\N
 854	telegram	348210710	out	Al_secret_bot	Ах, понимаю. 😉 Слова, сказанные в нужный момент, могут изменить всё. Какое послание ты хотел бы ей передать, если представится шанс?	1763922630977-348210710	0.950	smalltalk	none	\N	\N	\N	"{\\"actions\\":[\\"ask_question\\"],\\"tone\\":\\"neutral\\",\\"emotion\\":\\"curiosity\\",\\"trust\\":\\"medium\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"smalltalk\\",\\"confidence\\":0.85}"	2025-11-23 18:30:40.313+00	\N	beautybybabies
+855	telegram	1916087935	in	telegram	Hi	1766233248578-1916087935	\N	\N	\N	\N	\N	\N	{"tg_message_id": 412}	2025-12-20 12:20:51.762409+00	\N	\N
+856	telegram	1916087935	out	Al_secret_bot	Hey there, stranger. Feeling mysterious, or shall we uncover a bit more?	1766233248578-1916087935	1.000	greet	none	\N	\N	\N	"{\\"actions\\":[\\"ask_question\\"],\\"tone\\":\\"neutral\\",\\"emotion\\":\\"curiosity\\",\\"trust\\":\\"high\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"smalltalk\\",\\"confidence\\":0.9}"	2025-12-20 12:21:00.696+00	\N	Mecsy101
+857	telegram	1916087935	in	telegram	It's been a while	1766233505100-1916087935	\N	\N	\N	\N	\N	\N	{"tg_message_id": 414}	2025-12-20 12:25:06.633666+00	\N	\N
+858	telegram	1916087935	out	Al_secret_bot	Ah, absence, the sweet thief of time. What tales have you brought back with you, my dear?	1766233505100-1916087935	1.000	smalltalk	none	\N	\N	\N	"{\\"actions\\":[\\"ask_question\\"],\\"tone\\":\\"amused\\",\\"emotion\\":\\"curiosity\\",\\"trust\\":\\"high\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"smalltalk\\",\\"confidence\\":0.9}"	2025-12-20 12:25:19.483+00	\N	Mecsy101
 \.
 
 
@@ -2312,6 +2316,10 @@ ec5d7a38-9c0c-4fa4-b5a4-2c56c55e6d1c	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	user	�
 c8798f89-bc84-41da-8c90-278cd840e8ca	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	assistant	Взаимно, солнышко. 🌞 Что принесло тебя сюда сегодня? Или просто решил заглянуть, чтобы провести время вместе?	\N	\N	\N	\N	\N	2025-11-23 18:14:46.394+00
 fccd050c-55d9-4854-8ae8-7d48916a6665	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	user	Да я не тебе ябы ей сказал	\N	\N	\N	\N	\N	2025-11-23 18:30:32.754079+00
 89178cf9-e0d6-476d-b318-ef53d2d5dc58	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	assistant	Ах, понимаю. 😉 Слова, сказанные в нужный момент, могут изменить всё. Какое послание ты хотел бы ей передать, если представится шанс?	\N	\N	\N	\N	\N	2025-11-23 18:30:40.313+00
+f55684dd-3d68-47ee-a1af-8be0c6858871	ff20cd10-067d-4168-9bbe-e8aa6f9b710d	user	Hi	\N	\N	\N	\N	\N	2025-12-20 12:20:51.762409+00
+f3b36ce7-227a-446f-afce-97edc6cd8323	ff20cd10-067d-4168-9bbe-e8aa6f9b710d	assistant	Hey there, stranger. Feeling mysterious, or shall we uncover a bit more?	\N	\N	\N	\N	\N	2025-12-20 12:21:00.696+00
+6fc84d66-d11d-444f-b012-0bcd5a2b3f34	ff20cd10-067d-4168-9bbe-e8aa6f9b710d	user	It's been a while	\N	\N	\N	\N	\N	2025-12-20 12:25:06.633666+00
+ba4f852f-d6bf-4f9b-a4a1-67e6cb58298e	ff20cd10-067d-4168-9bbe-e8aa6f9b710d	assistant	Ah, absence, the sweet thief of time. What tales have you brought back with you, my dear?	\N	\N	\N	\N	\N	2025-12-20 12:25:19.483+00
 \.
 
 
@@ -2742,7 +2750,7 @@ SELECT pg_catalog.setval('public.admin_exec_logs_id_seq', 7, true);
 -- Name: interactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.interactions_id_seq', 854, true);
+SELECT pg_catalog.setval('public.interactions_id_seq', 858, true);
 
 
 --
@@ -2784,5 +2792,5 @@ SELECT pg_catalog.setval('realtime.subscription_id_seq', 1, false);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict y0ceJpaRjcDceOtZvTU5fhe5g5iKktZ5slUeh5uUgVcEypX5bMjbiHUcobXxyC1
+\unrestrict iZU2NGAXYGFrDLJImn1rid7SfsAIbjfv9DN0mzegLL47PJcVinMa6Y0btA9TrEv
 
