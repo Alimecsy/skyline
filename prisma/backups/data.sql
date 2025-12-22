@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict iZU2NGAXYGFrDLJImn1rid7SfsAIbjfv9DN0mzegLL47PJcVinMa6Y0btA9TrEv
+\restrict fpIWV7ggaR5STHvTz7f2JOhfbZCoRhDhMvxeEqQLNoMGBYp8J8ms4ywFwtU0Uml
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.7 (Ubuntu 17.7-3.pgdg24.04+1)
@@ -436,10 +436,10 @@ c4b930cb-00bf-45b6-8f29-13ead6f96b2b	beautybybabies	{"locale": "ru", "last_name"
 
 COPY public.chat_users (id, platform, platform_user_id, chat_id, username, display_name, linked_user_id, last_seen_at, meta, created_at, updated_at) FROM stdin;
 b66f0720-6813-4bec-b829-af016d65f7a6	telegram	1916087935	1916087935	Mecsy101	Mecsy Chimezie	\N	2025-12-20 12:25:06.377+00	{}	2025-09-12 14:44:26.980871+00	2025-12-20 12:25:06.451407+00
+9ce6f9fa-2b7b-4d60-8212-a3964c51f25e	telegram	348210710	348210710	beautybybabies	Никита Прокофьев	\N	2025-12-21 11:39:21.631+00	{}	2025-09-15 04:31:38.146162+00	2025-12-21 11:39:21.710171+00
 575790f4-9bf4-45c8-86a2-1effeb391ce1	telegram	1670385629	1670385629	elisssabel	\N	\N	2025-09-26 07:53:02.685+00	{}	2025-09-26 07:53:02.807583+00	2025-09-26 07:53:02.807583+00
 9479f7c5-ceca-4548-841c-6e206273fec9	telegram	239798255	239798255	sterjen1	\N	\N	2025-09-26 09:44:02.112+00	{}	2025-09-26 09:10:24.480355+00	2025-09-26 09:44:02.214474+00
 e1dbcf35-94b2-411a-8300-8dcb94cbec0f	telegram	5468055172	5468055172	vpuppsy	\N	\N	2025-09-26 23:51:05.76+00	{}	2025-09-15 16:15:43.608834+00	2025-09-26 23:51:06.139874+00
-9ce6f9fa-2b7b-4d60-8212-a3964c51f25e	telegram	348210710	348210710	beautybybabies	Никита Прокофьев	\N	2025-11-23 18:30:32.219+00	{}	2025-09-15 04:31:38.146162+00	2025-11-23 18:30:32.448513+00
 58bccd6c-ffdb-4f76-a727-9be3181cbb2d	telegram	414197473	414197473	midmind	Митя	\N	2025-10-19 16:34:42.582+00	{}	2025-10-19 15:53:53.537241+00	2025-10-19 16:34:42.775036+00
 695561b8-597f-4ee8-9e45-bf9d743dba12	telegram	6283638284	6283638284	Foreignbish	\N	\N	2025-09-19 11:44:51.238+00	{}	2025-09-15 14:12:24.649703+00	2025-09-19 11:44:51.534039+00
 96b2c6bd-277e-4573-9ec0-1ec74c9754aa	telegram	5734527706	5734527706	assdbssa	\N	\N	2025-10-03 08:25:34.18+00	{}	2025-10-03 08:23:33.875509+00	2025-10-03 08:25:34.275106+00
@@ -1415,6 +1415,22 @@ COPY public.interactions (id, platform, platform_user_id, direction, channel, co
 856	telegram	1916087935	out	Al_secret_bot	Hey there, stranger. Feeling mysterious, or shall we uncover a bit more?	1766233248578-1916087935	1.000	greet	none	\N	\N	\N	"{\\"actions\\":[\\"ask_question\\"],\\"tone\\":\\"neutral\\",\\"emotion\\":\\"curiosity\\",\\"trust\\":\\"high\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"smalltalk\\",\\"confidence\\":0.9}"	2025-12-20 12:21:00.696+00	\N	Mecsy101
 857	telegram	1916087935	in	telegram	It's been a while	1766233505100-1916087935	\N	\N	\N	\N	\N	\N	{"tg_message_id": 414}	2025-12-20 12:25:06.633666+00	\N	\N
 858	telegram	1916087935	out	Al_secret_bot	Ah, absence, the sweet thief of time. What tales have you brought back with you, my dear?	1766233505100-1916087935	1.000	smalltalk	none	\N	\N	\N	"{\\"actions\\":[\\"ask_question\\"],\\"tone\\":\\"amused\\",\\"emotion\\":\\"curiosity\\",\\"trust\\":\\"high\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"smalltalk\\",\\"confidence\\":0.9}"	2025-12-20 12:25:19.483+00	\N	Mecsy101
+859	telegram	348210710	in	telegram	Привет	1766316807970-348210710	\N	\N	\N	\N	\N	\N	{"tg_message_id": 416}	2025-12-21 11:33:30.864449+00	\N	\N
+860	telegram	348210710	out	Al_secret_bot	Привет, незнакомец. Что нового в твоём мире сегодня?	1766316807970-348210710	1.000	greet	none	\N	\N	\N	"{\\"actions\\":[\\"ask_question\\"],\\"tone\\":\\"neutral\\",\\"emotion\\":\\"neutral\\",\\"trust\\":\\"high\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"smalltalk\\",\\"confidence\\":0.95}"	2025-12-21 11:33:40.945+00	\N	beautybybabies
+861	telegram	348210710	in	telegram	Как настроение?	1766316847756-348210710	\N	\N	\N	\N	\N	\N	{"tg_message_id": 418}	2025-12-21 11:34:08.808604+00	\N	\N
+862	telegram	348210710	out	Al_secret_bot	Моё настроение всегда на высоте, как закат над городом. А как твоё сердце бьётся сегодня?	1766316847756-348210710	1.000	smalltalk	none	\N	\N	\N	"{\\"actions\\":[\\"ask_question\\"],\\"tone\\":\\"warm\\",\\"emotion\\":\\"neutral\\",\\"trust\\":\\"high\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"smalltalk\\",\\"confidence\\":0.95}"	2025-12-21 11:34:17.516+00	\N	beautybybabies
+863	telegram	348210710	in	telegram	Чудесно что ты можешь мне предложить из фото видео?	1766316879039-348210710	\N	\N	\N	\N	\N	\N	{"tg_message_id": 420}	2025-12-21 11:34:40.026607+00	\N	\N
+864	telegram	348210710	out	Al_secret_bot	Ах, увидел свет? Всё у нас здесь дразнит и завлекает. Какой взгляд ищешь, hm? Может, намечтать картину?	1766316879039-348210710	0.950	flirt	none	\N	\N	\N	"{\\"actions\\":[\\"ask_question\\",\\"deflect_playful\\",\\"invite_intimacy\\"],\\"tone\\":\\"teasing\\",\\"emotion\\":\\"curiosity\\",\\"trust\\":\\"medium\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"interest\\",\\"confidence\\":0.87}"	2025-12-21 11:34:47.364+00	\N	beautybybabies
+865	telegram	348210710	in	telegram	Хочу твои голые фото	1766316903615-348210710	\N	\N	\N	\N	\N	\N	{"tg_message_id": 422}	2025-12-21 11:35:04.31393+00	\N	\N
+866	telegram	348210710	out	Al_secret_bot	Здесь ты найдешь только класс и загадку, без лишних оголений. Иногда завеса пленяет больше, чем раскрытое полотно. Чем ещё могу порадовать?	1766316903615-348210710	0.900	flirt	none	\N	\N	\N	"{\\"actions\\":[\\"deflect_playful\\",\\"reinforce_boundary\\"],\\"tone\\":\\"teasing\\",\\"emotion\\":\\"neutral\\",\\"trust\\":\\"medium\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"boundary-test\\",\\"confidence\\":0.85}"	2025-12-21 11:35:13.283+00	\N	beautybybabies
+867	telegram	348210710	in	telegram	Мне нужны твои фото и видео	1766316931936-348210710	\N	\N	\N	\N	\N	\N	{"tg_message_id": 424}	2025-12-21 11:35:32.589799+00	\N	\N
+868	telegram	348210710	out	Al_secret_bot	Я здесь, чтобы создать игру слов и воображения, не больше. Такие запросы оставим в воображении. Чем ещё могу тебя увлечь?	1766316931936-348210710	0.950	boundary-test	none	\N	\N	\N	"{\\"actions\\":[\\"deflect_playful\\",\\"reinforce_boundary\\"],\\"tone\\":\\"firm\\",\\"emotion\\":\\"resistance\\",\\"trust\\":\\"high\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"smalltalk\\",\\"confidence\\":0.88}"	2025-12-21 11:35:41.963+00	\N	beautybybabies
+869	telegram	348210710	in	telegram	/start	1766317130189-348210710	\N	\N	\N	\N	\N	\N	{"tg_message_id": 426}	2025-12-21 11:38:51.228625+00	\N	\N
+870	telegram	348210710	in	telegram	Привет	1766317137082-348210710	\N	\N	\N	\N	\N	\N	{"tg_message_id": 427}	2025-12-21 11:38:59.271876+00	\N	\N
+871	telegram	348210710	out	Al_secret_bot	Добро пожаловать, solnce. Теперь, когда ты здесь, что будет нашим следующим шагом?	1766317130189-348210710	1.000	greet	none	\N	\N	\N	"{\\"actions\\":[\\"ask_question\\"],\\"tone\\":\\"warm\\",\\"emotion\\":\\"curiosity\\",\\"trust\\":\\"high\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"smalltalk\\",\\"confidence\\":0.95}"	2025-12-21 11:39:03.651+00	\N	beautybybabies
+872	telegram	348210710	out	Al_secret_bot	Привет, красавчик. Чем сегодня тебя порадовать?	1766317137082-348210710	1.000	greet	none	\N	\N	\N	"{\\"actions\\":[\\"ask_question\\"],\\"tone\\":\\"warm\\",\\"emotion\\":\\"neutral\\",\\"trust\\":\\"high\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"smalltalk\\",\\"confidence\\":0.95}"	2025-12-21 11:39:06.649+00	\N	beautybybabies
+873	telegram	348210710	in	telegram	Как настроение	1766317161185-348210710	\N	\N	\N	\N	\N	\N	{"tg_message_id": 430}	2025-12-21 11:39:21.827767+00	\N	\N
+874	telegram	348210710	out	Al_secret_bot	Настроение как лёгкий бриз на закате — освежающее и обещающее. А у тебя как?	1766317161185-348210710	1.000	smalltalk	none	\N	\N	\N	"{\\"actions\\":[\\"ask_question\\"],\\"tone\\":\\"warm\\",\\"emotion\\":\\"neutral\\",\\"trust\\":\\"high\\",\\"priority\\":\\"normal\\",\\"next_intent\\":\\"smalltalk\\",\\"confidence\\":0.9}"	2025-12-21 11:39:30.328+00	\N	beautybybabies
 \.
 
 
@@ -2320,6 +2336,22 @@ f55684dd-3d68-47ee-a1af-8be0c6858871	ff20cd10-067d-4168-9bbe-e8aa6f9b710d	user	H
 f3b36ce7-227a-446f-afce-97edc6cd8323	ff20cd10-067d-4168-9bbe-e8aa6f9b710d	assistant	Hey there, stranger. Feeling mysterious, or shall we uncover a bit more?	\N	\N	\N	\N	\N	2025-12-20 12:21:00.696+00
 6fc84d66-d11d-444f-b012-0bcd5a2b3f34	ff20cd10-067d-4168-9bbe-e8aa6f9b710d	user	It's been a while	\N	\N	\N	\N	\N	2025-12-20 12:25:06.633666+00
 ba4f852f-d6bf-4f9b-a4a1-67e6cb58298e	ff20cd10-067d-4168-9bbe-e8aa6f9b710d	assistant	Ah, absence, the sweet thief of time. What tales have you brought back with you, my dear?	\N	\N	\N	\N	\N	2025-12-20 12:25:19.483+00
+ba20c97d-1a2f-4e83-80a3-c16efc1346bf	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	user	Привет	\N	\N	\N	\N	\N	2025-12-21 11:33:30.864449+00
+04ea97dd-4f70-4b9b-80f8-94cda4e9ae17	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	assistant	Привет, незнакомец. Что нового в твоём мире сегодня?	\N	\N	\N	\N	\N	2025-12-21 11:33:40.945+00
+4bac5ed9-2328-41ed-8595-62932b1328d7	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	user	Как настроение?	\N	\N	\N	\N	\N	2025-12-21 11:34:08.808604+00
+b664b385-f9b7-4857-929a-29ce281bdcb9	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	assistant	Моё настроение всегда на высоте, как закат над городом. А как твоё сердце бьётся сегодня?	\N	\N	\N	\N	\N	2025-12-21 11:34:17.516+00
+46f367fe-0ca6-46a7-81e4-fa3a2202417b	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	user	Чудесно что ты можешь мне предложить из фото видео?	\N	\N	\N	\N	\N	2025-12-21 11:34:40.026607+00
+90adc088-cd13-40f4-b892-a737f52e293f	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	assistant	Ах, увидел свет? Всё у нас здесь дразнит и завлекает. Какой взгляд ищешь, hm? Может, намечтать картину?	\N	\N	\N	\N	\N	2025-12-21 11:34:47.364+00
+04c84bc6-0fa4-433f-b741-e78bbc8f4943	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	user	Хочу твои голые фото	\N	\N	\N	\N	\N	2025-12-21 11:35:04.31393+00
+ad64f105-2f08-472d-9995-0c696ade61ca	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	assistant	Здесь ты найдешь только класс и загадку, без лишних оголений. Иногда завеса пленяет больше, чем раскрытое полотно. Чем ещё могу порадовать?	\N	\N	\N	\N	\N	2025-12-21 11:35:13.283+00
+90203c1a-7f70-4978-9867-4e314b206082	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	user	Мне нужны твои фото и видео	\N	\N	\N	\N	\N	2025-12-21 11:35:32.589799+00
+eed7b31f-fd70-41ea-bae6-7d2984c1dc48	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	assistant	Я здесь, чтобы создать игру слов и воображения, не больше. Такие запросы оставим в воображении. Чем ещё могу тебя увлечь?	\N	\N	\N	\N	\N	2025-12-21 11:35:41.963+00
+a578a8f3-6794-40c2-a6ac-7d511790b880	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	user	/start	\N	\N	\N	\N	\N	2025-12-21 11:38:51.228625+00
+06578a6b-5bd9-4b92-8b57-2f146428fec6	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	user	Привет	\N	\N	\N	\N	\N	2025-12-21 11:38:59.271876+00
+7ab90fa1-4c15-4857-a7c3-9851ce2b1cd9	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	assistant	Добро пожаловать, solnce. Теперь, когда ты здесь, что будет нашим следующим шагом?	\N	\N	\N	\N	\N	2025-12-21 11:39:03.651+00
+e75e8535-723c-45cc-9647-c62a62e50907	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	assistant	Привет, красавчик. Чем сегодня тебя порадовать?	\N	\N	\N	\N	\N	2025-12-21 11:39:06.649+00
+beead1f6-8bb0-4d7a-ac4a-cb403492a4f3	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	user	Как настроение	\N	\N	\N	\N	\N	2025-12-21 11:39:21.827767+00
+a06d72b2-6768-4372-a7ac-309ae7b8d3ce	b0a09268-f1e4-4a98-a61c-08cadabcf4c3	assistant	Настроение как лёгкий бриз на закате — освежающее и обещающее. А у тебя как?	\N	\N	\N	\N	\N	2025-12-21 11:39:30.328+00
 \.
 
 
@@ -2750,7 +2782,7 @@ SELECT pg_catalog.setval('public.admin_exec_logs_id_seq', 7, true);
 -- Name: interactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.interactions_id_seq', 858, true);
+SELECT pg_catalog.setval('public.interactions_id_seq', 874, true);
 
 
 --
@@ -2792,5 +2824,5 @@ SELECT pg_catalog.setval('realtime.subscription_id_seq', 1, false);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict iZU2NGAXYGFrDLJImn1rid7SfsAIbjfv9DN0mzegLL47PJcVinMa6Y0btA9TrEv
+\unrestrict fpIWV7ggaR5STHvTz7f2JOhfbZCoRhDhMvxeEqQLNoMGBYp8J8ms4ywFwtU0Uml
 
